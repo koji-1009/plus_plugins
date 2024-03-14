@@ -1,0 +1,25 @@
+name: sensors_plus pages
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Install Flutter"
+        run: ./.github/workflows/scripts/install-flutter.sh stable
+      - name: "Install Tools"
+        run: ./.github/workflows/scripts/install-tools.sh
+      - name: "Build Example"
+        run: |
+          melos bootstrap --scope="sensors_plus"
+          melos exec -c 1 --scope="sensors_plus_example" -- flutter build web --target="./lib/main.dart" --dart-define=CI=true --base-href "/plus_plugins/"
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/sensors_plus/sensors_plus/example/build/web
