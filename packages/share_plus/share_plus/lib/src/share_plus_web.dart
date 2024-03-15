@@ -1,12 +1,17 @@
-import 'dart:html' as html;
+import 'dart:developer' as developer;
+import 'dart:js_interop';
 import 'dart:typed_data';
+import 'dart:ui';
 
-import 'package:flutter/widgets.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:meta/meta.dart';
 import 'package:mime/mime.dart' show lookupMimeType;
-import 'package:share_plus_platform_interface/share_plus_platform_interface.dart';
+import 'package:share_plus_platform_interface/platform_interface/share_plus_platform.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:url_launcher_web/url_launcher_web.dart';
+import 'package:web/web.dart' as web
+    show DOMException, File, FilePropertyBag, Navigator, window;
 
 /// The web implementation of [SharePlatform].
 class SharePlusWebPlugin extends SharePlatform {
@@ -17,13 +22,37 @@ class SharePlusWebPlugin extends SharePlatform {
     SharePlatform.instance = SharePlusWebPlugin(UrlLauncherPlugin());
   }
 
-  final html.Navigator _navigator;
+  final web.Navigator _navigator;
 
   /// A constructor that allows tests to override the window object used by the plugin.
   SharePlusWebPlugin(
     this.urlLauncher, {
-    @visibleForTesting html.Navigator? debugNavigator,
-  }) : _navigator = debugNavigator ?? html.window.navigator;
+    @visibleForTesting web.Navigator? debugNavigator,
+  }) : _navigator = debugNavigator ?? web.window.navigator;
+
+  @override
+  Future<void> shareUri(
+    Uri uri, {
+    Rect? sharePositionOrigin,
+  }) async {
+    final data = ShareData(
+      url: uri.toString(),
+    );
+
+    if (!_canShare(data)) {
+      return;
+    }
+
+    try {
+      await _navigator.share(data).toDart;
+    } on web.DOMException catch (e) {
+      // Ignore DOMException
+      developer.log(
+        'Failed to share uri',
+        error: '${e.name}: ${e.message}',
+      );
+    }
+  }
 
   /// Share text
   @override
@@ -32,10 +61,39 @@ class SharePlusWebPlugin extends SharePlatform {
     String? subject,
     Rect? sharePositionOrigin,
   }) async {
+    await shareWithResult(
+      text,
+      subject: subject,
+      sharePositionOrigin: sharePositionOrigin,
+    );
+  }
+
+  @override
+  Future<ShareResult> shareWithResult(
+    String text, {
+    String? subject,
+    Rect? sharePositionOrigin,
+  }) async {
+    final data = ShareData(
+      title: subject,
+      text: text,
+    );
+
+    if (!_canShare(data)) {
+      return _resultUnavailable;
+    }
+
     try {
-      await _navigator.share({'title': subject, 'text': text});
-    } on NoSuchMethodError catch (_) {
-      //Navigator is not available or the webPage is not served on https
+      await _navigator.share(data).toDart;
+
+      // actions is success, but can't get the action name
+      return _resultUnavailable;
+    } on web.DOMException catch (e) {
+      if (e.name case 'AbortError') {
+        return _resultDismissed;
+      }
+
+      // Navigator is not available or the webPage is not served on https
       final queryParameters = {
         if (subject != null) 'subject': subject,
         'body': text,
@@ -58,6 +116,8 @@ class SharePlusWebPlugin extends SharePlatform {
         throw Exception('Failed to launch $uri');
       }
     }
+
+    return _resultUnavailable;
   }
 
   /// Share files
@@ -68,12 +128,29 @@ class SharePlusWebPlugin extends SharePlatform {
     String? subject,
     String? text,
     Rect? sharePositionOrigin,
-  }) {
+  }) async {
+    await shareFilesWithResult(
+      paths,
+      mimeTypes: mimeTypes,
+      subject: subject,
+      text: text,
+      sharePositionOrigin: sharePositionOrigin,
+    );
+  }
+
+  @override
+  Future<ShareResult> shareFilesWithResult(
+    List<String> paths, {
+    List<String>? mimeTypes,
+    String? subject,
+    String? text,
+    Rect? sharePositionOrigin,
+  }) async {
     final files = <XFile>[];
     for (var i = 0; i < paths.length; i++) {
       files.add(XFile(paths[i], mimeType: mimeTypes?[i]));
     }
-    return shareXFiles(
+    return await shareXFiles(
       files,
       subject: subject,
       text: text,
@@ -96,29 +173,60 @@ class SharePlusWebPlugin extends SharePlatform {
     String? text,
     Rect? sharePositionOrigin,
   }) async {
-    // See https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share
-
-    final webFiles = <html.File>[];
+    final webFiles = <web.File>[];
     for (final xFile in files) {
       webFiles.add(await _fromXFile(xFile));
     }
-    await _navigator.share({
-      if (subject?.isNotEmpty ?? false) 'title': subject,
-      if (text?.isNotEmpty ?? false) 'text': text,
-      if (webFiles.isNotEmpty) 'files': webFiles,
-    });
+
+    final data = ShareData(
+      title: subject,
+      text: text,
+      files: webFiles.toJS,
+    );
+
+    if (!_canShare(data)) {
+      return _resultUnavailable;
+    }
+
+    try {
+      await _navigator.share(data).toDart;
+
+      // actions is success, but can't get the action name
+      return _resultUnavailable;
+    } on web.DOMException catch (e) {
+      developer.log(
+        'Failed to share files',
+        error: '${e.name}: ${e.message}',
+      );
+
+      if (e.name case 'AbortError') {
+        return _resultDismissed;
+      }
+    }
 
     return _resultUnavailable;
   }
 
-  static Future<html.File> _fromXFile(XFile file) async {
+  bool _canShare(ShareData data) {
+    try {
+      return _navigator.canShare(data);
+    } on web.DOMException catch (e) {
+      developer.log(
+        'Share API is not supported in this User Agent.',
+        error: '${e.name}: ${e.message}',
+      );
+
+      return false;
+    }
+  }
+
+  static Future<web.File> _fromXFile(XFile file) async {
     final bytes = await file.readAsBytes();
-    return html.File(
-      [ByteData.sublistView(bytes)],
+    return web.File(
+      [bytes.buffer.toJS].toJS,
       file.name,
-      {
-        'type': file.mimeType ?? _mimeTypeForPath(file, bytes),
-      },
+      web.FilePropertyBag()
+        ..type = file.mimeType ?? _mimeTypeForPath(file, bytes),
     );
   }
 
@@ -128,7 +236,29 @@ class SharePlusWebPlugin extends SharePlatform {
   }
 }
 
+const _resultDismissed = ShareResult(
+  '',
+  ShareResultStatus.dismissed,
+);
+
 const _resultUnavailable = ShareResult(
   'dev.fluttercommunity.plus/share/unavailable',
   ShareResultStatus.unavailable,
 );
+
+extension on web.Navigator {
+  /// https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share
+  external JSPromise share(ShareData data);
+
+  /// https://developer.mozilla.org/en-US/docs/Web/API/Navigator/canShare
+  external bool canShare(ShareData data);
+}
+
+extension type ShareData._(JSObject _) implements JSObject {
+  external factory ShareData({
+    String? title,
+    String? text,
+    String? url,
+    JSArray<web.File>? files,
+  });
+}
