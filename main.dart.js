@@ -76696,27 +76696,28 @@ A.a0R.prototype={
 zO(a){$.CA().n(0,this,a)}}
 A.a4c.prototype={
 po(a,b){return this.TP(a,b)},
-TP(a,b){var s=0,r=A.K(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g
+TP(a,b){var s=0,r=A.K(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f
 var $async$po=A.L(function(c,d){if(c===1){o=d
-s=p}while(true)switch(s){case 0:i={url:a.k(0)}
-h=null
-try{h=A.f(n.b,"canShare",[i])}catch(f){j=A.aa(f)
-if(t.o.b(j)){m=j
+s=p}while(true)switch(s){case 0:h={url:a.k(0)}
+g=null
+try{k=A.f(n.b,"canShare",[h])
+g=k==null?!1:k}catch(e){i=A.aa(e)
+if(t.o.b(i)){m=i
 if(J.c(m.name,"TypeError"))A.lF(u.A,A.h(m.name)+": "+A.h(m.message))
 else A.lF("Unexpected error when checking if sharing uri is available",A.h(m.name)+": "+A.h(m.message))
 s=1
-break}else throw f}if(!h){s=1
+break}else throw e}if(!g){s=1
 break}p=4
 s=7
-return A.P(A.dZ(A.f(n.b,"share",[i]),t.X),$async$po)
+return A.P(A.dZ(A.f(n.b,"share",[h]),t.X),$async$po)
 case 7:p=2
 s=6
 break
 case 4:p=3
-g=o
-j=A.aa(g)
-if(t.o.b(j)){l=j
-A.lF("Failed to share uri",A.h(l.name)+": "+A.h(l.message))}else throw g
+f=o
+i=A.aa(f)
+if(t.o.b(i)){l=i
+A.lF("Failed to share uri",A.h(l.name)+": "+A.h(l.message))}else throw f
 s=6
 break
 case 3:s=2
@@ -76732,41 +76733,42 @@ return A.P(q.iL(a,b,c),$async$pn)
 case 2:return A.I(null,r)}})
 return A.J($async$pn,r)},
 iL(a,b,c){return this.TR(a,b,c)},
-TR(a0,a1,a2){var s=0,r=A.K(t.vS),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c,b,a
-var $async$iL=A.L(function(a3,a4){if(a3===1){o=a4
-s=p}while(true)switch(s){case 0:c=null
-if(a2.length!==0)c={text:a0,title:a2}
-else c={text:a0}
+TR(a1,a2,a3){var s=0,r=A.K(t.vS),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0
+var $async$iL=A.L(function(a4,a5){if(a4===1){o=a5
+s=p}while(true)switch(s){case 0:b=null
+if(a3.length!==0)b={text:a1,title:a3}
+else b={text:a1}
 m=null
 p=4
-m=A.f(n.b,"canShare",[c])
+e=A.f(n.b,"canShare",[b])
+m=e==null?!1:e
 p=2
 s=6
 break
 case 4:p=3
-b=o
-d=A.aa(b)
-s=t.o.b(d)?7:9
+a=o
+c=A.aa(a)
+s=t.o.b(c)?7:9
 break
-case 7:l=d
+case 7:l=c
 if(J.c(l.name,"TypeError"))A.lF(u.A,A.h(l.name)+": "+A.h(l.message))
 else A.lF("Unexpected error when checking if sharing text is available",A.h(l.name)+": "+A.h(l.message))
-d=t.N
-k=A.y(d,d)
-J.CF(k,"subject",a2)
-J.CF(k,"body",a0)
+c=t.N
+k=A.y(c,c)
+J.CF(k,"subject",a3)
+J.CF(k,"body",a1)
 j=k
-i=A.Qd(null,null,j.geP().f9(0,new A.a4e(),d).bR(0,"&"),null,"mailto")
+i=A.Qd(null,null,j.geP().f9(0,new A.a4e(),c).bR(0,"&"),null,"mailto")
 s=10
 return A.P(n.a.EL(i.gnL(),B.Dl),$async$iL)
-case 10:h=a4
+case 10:h=a5
 if(!h)throw A.e(A.c3("Failed to launch "+A.h(i)))
 q=B.c_
 s=1
 break
 s=8
 break
-case 9:throw b
+case 9:throw a
 case 8:s=6
 break
 case 3:s=2
@@ -76775,7 +76777,7 @@ case 6:if(!m){q=B.c_
 s=1
 break}p=12
 s=15
-return A.P(A.dZ(A.f(n.b,"share",[c]),t.X),$async$iL)
+return A.P(A.dZ(A.f(n.b,"share",[b]),t.X),$async$iL)
 case 15:q=B.c_
 s=1
 break
@@ -76783,13 +76785,13 @@ p=2
 s=14
 break
 case 12:p=11
-a=o
-k=A.aa(a)
+a0=o
+k=A.aa(a0)
 if(t.o.b(k)){g=k
 f=g.name
 if("AbortError"===f){q=B.wV
 s=1
-break}A.lF("Failed to share text",A.h(g.name)+": "+A.h(g.message))}else throw a
+break}A.lF("Failed to share text",A.h(g.name)+": "+A.h(g.message))}else throw a0
 s=14
 break
 case 11:s=2
@@ -76801,31 +76803,32 @@ case 1:return A.I(q,r)
 case 2:return A.H(o,r)}})
 return A.J($async$iL,r)},
 jA(a,b,c,d){return this.TT(a,b,c,d)},
-TT(a,b,a0,a1){var s=0,r=A.K(t.vS),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c
-var $async$jA=A.L(function(a3,a4){if(a3===1){o=a4
-s=p}while(true)switch(s){case 0:e=A.b([],t.E5)
+TT(a,a0,a1,a2){var s=0,r=A.K(t.vS),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c,b
+var $async$jA=A.L(function(a4,a5){if(a4===1){o=a5
+s=p}while(true)switch(s){case 0:d=A.b([],t.E5)
 h=a.length,g=0
 case 3:if(!(g<a.length)){s=5
-break}c=e
+break}b=d
 s=6
 return A.P(A.a4d(a[g]),$async$jA)
-case 6:c.push(a4)
+case 6:b.push(a5)
 case 4:a.length===h||(0,A.D)(a),++g
 s=3
 break
 case 5:m=null
-if(a1!=null&&a1.length!==0)if(a0!=null&&a0.length!==0)m={files:e,text:a1,title:a0}
-else m={files:e,text:a1}
-else if(a0!=null&&a0.length!==0)m={files:e,title:a0}
-else m={files:e}
+if(a2!=null&&a2.length!==0)if(a1!=null&&a1.length!==0)m={files:d,text:a2,title:a1}
+else m={files:d,text:a2}
+else if(a1!=null&&a1.length!==0)m={files:d,title:a1}
+else m={files:d}
 l=null
-try{l=A.f(n.b,"canShare",[m])}catch(a2){h=A.aa(a2)
+try{f=A.f(n.b,"canShare",[m])
+l=f==null?!1:f}catch(a3){h=A.aa(a3)
 if(t.o.b(h)){k=h
 if(J.c(k.name,"TypeError"))A.lF(u.A,A.h(k.name)+": "+A.h(k.message))
 else A.lF("Unexpected error when checking if sharing files is available",A.h(k.name)+": "+A.h(k.message))
 q=B.c_
 s=1
-break}else throw a2}if(!l){q=B.c_
+break}else throw a3}if(!l){q=B.c_
 s=1
 break}p=8
 s=11
@@ -76837,13 +76840,13 @@ p=2
 s=10
 break
 case 8:p=7
-d=o
-h=A.aa(d)
+c=o
+h=A.aa(c)
 if(t.o.b(h)){j=h
 i=j.name
 if("AbortError"===i){q=B.wV
 s=1
-break}A.lF("Failed to share files",A.h(j.name)+": "+A.h(j.message))}else throw d
+break}A.lF("Failed to share files",A.h(j.name)+": "+A.h(j.message))}else throw c
 s=10
 break
 case 7:s=2
