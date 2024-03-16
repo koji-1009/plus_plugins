@@ -195,25 +195,37 @@ class DemoAppState extends State<DemoApp> {
     // a RenderObjectWidget. The ElevatedButton's RenderObject
     // has its position and size after it's built.
     final box = context.findRenderObject() as RenderBox?;
+    final Rect? sharePositionOrigin;
+    if (kIsWeb) {
+      sharePositionOrigin = null;
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      sharePositionOrigin = box!.localToGlobal(Offset.zero) & box.size;
+    } else {
+      sharePositionOrigin = null;
+    }
 
     if (uri.isNotEmpty) {
       await Share.shareUri(
         Uri.parse(uri),
-        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+        sharePositionOrigin: sharePositionOrigin,
       );
     } else if (imagePaths.isNotEmpty) {
       final files = <XFile>[];
       for (var i = 0; i < imagePaths.length; i++) {
         files.add(XFile(imagePaths[i], name: imageNames[i]));
       }
-      await Share.shareXFiles(files,
-          text: text,
-          subject: subject,
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      await Share.shareXFiles(
+        files,
+        text: text,
+        subject: subject,
+        sharePositionOrigin: sharePositionOrigin,
+      );
     } else {
-      await Share.share(text,
-          subject: subject,
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      await Share.share(
+        text,
+        subject: subject,
+        sharePositionOrigin: sharePositionOrigin,
+      );
     }
   }
 
