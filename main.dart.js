@@ -76816,7 +76816,7 @@ break
 case 5:m=null
 if(a1!=null&&a1.length!==0)if(a0!=null&&a0.length!==0)m={files:e,text:a1,title:a0}
 else m={files:e,text:a1}
-else if(a0!=null&&a0.length!==0)m={files:e,text:"",title:a0}
+else if(a0!=null&&a0.length!==0)m={files:e,title:a0}
 else m={files:e}
 l=null
 try{l=A.f(n.b,"canShare",[m])}catch(a2){h=A.aa(a2)
