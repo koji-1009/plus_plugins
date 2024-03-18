@@ -36525,7 +36525,7 @@ break
 case 3:q=2
 j=p
 m=A.ak(j)
-A.oR("Error getting battery state: "+A.h(m))
+A.oR("main: Error getting battery state: "+A.h(m))
 l=o.a
 l.aw(new A.a0a(l))
 s=5
